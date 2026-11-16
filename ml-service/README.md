@@ -33,7 +33,18 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
 No dataset or `.pt` is required to run the service. Without `YOLO_MODEL_PATH`, `POST /classify` returns a structured stub (`model: "stub"`).
 
-When you have a trained Ultralytics weight:
+### Train (local)
+
+See [`training/README.md`](training/README.md). Short path:
+
+```bash
+cp datasets/dental/data.yaml.example datasets/dental/data.yaml
+# put images + YOLO labels under datasets/dental/{images,labels}/{train,val}
+python training/train.py --data datasets/dental/data.yaml --device cpu
+cp runs/detect/dental/weights/best.pt models/dental-yolo.pt
+```
+
+### Serve a trained weight
 
 1. Place the file outside git (e.g. `ml-service/models/dental-yolo.pt`) — `*.pt` is gitignored.
 2. Set in `.env`:

@@ -21,3 +21,14 @@ ml-service/data/**
 !ml-service/data/rag/
 !ml-service/data/rag/.gitkeep
 *.pdf
+
+# YOLO dataset payloads (keep folder structure + example yaml)
+ml-service/datasets/**/data.yaml
+ml-service/datasets/**/images/**/*.jpg
+ml-service/datasets/**/images/**/*.jpeg
+ml-service/datasets/**/images/**/*.png
+ml-service/datasets/**/images/**/*.tif
+ml-service/datasets/**/images/**/*.tiff
+ml-service/datasets/**/images/**/*.bmp
+ml-service/datasets/**/images/**/*.webp
+ml-service/datasets/**/labels/**/*.txt

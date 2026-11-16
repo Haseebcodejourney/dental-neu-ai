@@ -1,0 +1,16 @@
+# Ultralytics YOLO dataset config for Dental NEU AI (detection).
+# Copy to data.yaml (gitignored) and adjust paths if needed:
+#   cp datasets/dental/data.yaml.example datasets/dental/data.yaml
+#
+# Class list is a draft MVP (treatment features) — lock with Hamza before labeling.
+
+path: . # dataset root = this folder (Ultralytics resolves relative to this file)
+train: images/train
+val: images/val
+# test: images/test  # optional holdout
+
+names:
+  0: implant
+  1: crown_or_fixed_restoration
+  2: endodontic_filling
+  3: filling

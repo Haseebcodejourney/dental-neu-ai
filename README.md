@@ -52,4 +52,4 @@ See [`backend/README.md`](backend/README.md) and [`ml-service/README.md`](ml-ser
 
 ## Status
 
-Scaffold + stub ML wiring. YOLO loads optional `.pt`; RAG lists optional class PDFs under `RAG_PDF_DIR/{class}/*.pdf`. No weights, corpus, or Claude/LlamaIndex inference in-repo.
+Scaffold + stub ML wiring. YOLO loads optional `.pt`; train layout under `ml-service/training/` + `datasets/dental/`. RAG lists optional class PDFs under `RAG_PDF_DIR/{class}/*.pdf`. No weights, corpus, or Claude/LlamaIndex inference in-repo.
