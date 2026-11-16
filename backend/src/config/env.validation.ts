@@ -26,6 +26,10 @@ class EnvironmentVariables {
   @IsBooleanString()
   SYNC_SCHEMA?: string;
 
+  @IsOptional()
+  @IsString()
+  ML_SERVICE_URL?: string;
+
   @IsString()
   DATABASE_HOST!: string;
 

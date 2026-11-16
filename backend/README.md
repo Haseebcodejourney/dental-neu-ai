@@ -12,7 +12,7 @@ Backend for **Dental NEU AI**: image upload metadata → CV classification → c
 
 Prisma was considered; TypeORM was preferred for tighter Nest module/entity wiring without a separate generate step for this scaffold.
 
-## Pipeline entities (schemas only)
+## Pipeline entities
 
 - `ImageUpload` — upload metadata
 - `DiagnosisJob` — job status for the CV → RAG → LLM flow
@@ -20,7 +20,7 @@ Prisma was considered; TypeORM was preferred for tighter Nest module/entity wiri
 - `RagCitation` — class-aligned retrieved passages
 - `LlmResponse` — grounded diagnostic text
 
-No fake AI implementations — stubs only.
+AI inference lives in `ml-service/` (FastAPI). Nest calls it via `MlClientService` (`ML_SERVICE_URL`).
 
 ## Database bootstrap
 
@@ -64,7 +64,8 @@ API base: `http://localhost:3000/api`
 - `GET /api/health` — process health
 - `GET /api/health?db=true` — health + Postgres ping
 - `GET /api/uploads` — stub
-- `GET /api/diagnosis` — stub
+- `GET /api/diagnosis` — usage hint
+- `POST /api/diagnosis/run` — multipart `image` → record job → ML classify → ML diagnose → persist stubs
 
 ## Point at AWS Aurora PostgreSQL
 
@@ -103,9 +104,12 @@ SYNC_SCHEMA=true
 
 ```
 src/
-  config/       env load + validation
+  config/       env load + validation (incl. ML_SERVICE_URL)
   database/     ensure DB + TypeORM ↔ Postgres/Aurora
   health/       health (+ optional DB ping)
   uploads/      image metadata entity + stub controller
-  diagnosis/    job / CV / RAG / LLM entities + stub controller
+  ml/           thin HttpClient to FastAPI ml-service
+  diagnosis/    job orchestration + CV / RAG / LLM entities
 ```
+
+Requires `ml-service` running (default `http://localhost:8000`).
