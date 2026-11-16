@@ -52,4 +52,4 @@ See [`backend/README.md`](backend/README.md) and [`ml-service/README.md`](ml-ser
 
 ## Status
 
-Scaffold + stub ML wiring. No real YOLO/RAG/Claude inference yet. Zero secrets in-repo.
+Scaffold + stub ML wiring. YOLO loads from `YOLO_MODEL_PATH` when a `.pt` is present; otherwise `/classify` returns a structured stub. No weights or datasets in-repo. RAG/Claude still stubbed.

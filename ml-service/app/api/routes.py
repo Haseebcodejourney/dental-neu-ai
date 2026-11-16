@@ -1,7 +1,19 @@
 from fastapi import APIRouter, File, UploadFile
 from pydantic import BaseModel, ConfigDict, Field
 
+from app.services.yolo_classifier import get_classifier
+
 router = APIRouter()
+
+
+class Detection(BaseModel):
+    model_config = ConfigDict(populate_by_name=True, ser_json_by_alias=True)
+
+    class_: str = Field(alias="class")
+    confidence: float
+    bbox: list[float] = Field(
+        description="Absolute xyxy pixel coords [x1, y1, x2, y2]",
+    )
 
 
 class ClassifyResponse(BaseModel):
@@ -10,6 +22,7 @@ class ClassifyResponse(BaseModel):
     class_: str = Field(alias="class")
     confidence: float
     model: str
+    detections: list[Detection] = Field(default_factory=list)
 
 
 class DiagnoseRequest(BaseModel):
@@ -39,11 +52,10 @@ def health() -> dict[str, str]:
 
 @router.post("/classify", response_model=ClassifyResponse)
 async def classify(image: UploadFile = File(...)) -> ClassifyResponse:
-    """Stub CV classification. Wire YOLO (YOLO_MODEL_PATH) later."""
-    _ = await image.read()
-    return ClassifyResponse.model_validate(
-        {"class": "placeholder_class", "confidence": 0.0, "model": "yolo-stub"}
-    )
+    """CV classification via Ultralytics YOLO, or stub when no model is configured."""
+    image_bytes = await image.read()
+    result = get_classifier().classify(image_bytes)
+    return ClassifyResponse.model_validate(result)
 
 
 @router.post("/diagnose", response_model=DiagnoseResponse)
