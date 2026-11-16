@@ -1,0 +1,29 @@
+# compiled
+/dist
+/build
+*.tsbuildinfo
+
+# deps
+/node_modules
+
+# env / secrets
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# logs & coverage
+logs
+*.log
+npm-debug.log*
+coverage
+/.nyc_output
+
+# IDE / OS
+.idea
+.vscode
+*.swp
+.DS_Store
+
+# Nest
+/.nest
