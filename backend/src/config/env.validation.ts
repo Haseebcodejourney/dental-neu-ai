@@ -5,6 +5,7 @@ import {
   IsInt,
   IsOptional,
   IsString,
+  Matches,
   Max,
   Min,
   validateSync,
@@ -20,6 +21,10 @@ class EnvironmentVariables {
   @Min(1)
   @Max(65535)
   PORT?: number;
+
+  @IsOptional()
+  @IsBooleanString()
+  SYNC_SCHEMA?: string;
 
   @IsString()
   DATABASE_HOST!: string;
@@ -37,11 +42,26 @@ class EnvironmentVariables {
   DATABASE_PASSWORD!: string;
 
   @IsString()
+  @Matches(/^[a-zA-Z_][a-zA-Z0-9_]*$/, {
+    message:
+      'DATABASE_NAME must be a simple Postgres identifier (e.g. dental_neu_ai)',
+  })
   DATABASE_NAME!: string;
 
   @IsOptional()
   @IsBooleanString()
   DATABASE_SSL?: string;
+
+  @IsOptional()
+  @IsBooleanString()
+  DATABASE_ENSURE?: string;
+
+  @IsOptional()
+  @IsString()
+  @Matches(/^[a-zA-Z_][a-zA-Z0-9_]*$/, {
+    message: 'DATABASE_MAINTENANCE_NAME must be a simple Postgres identifier',
+  })
+  DATABASE_MAINTENANCE_NAME?: string;
 }
 
 export function validateEnv(config: Record<string, unknown>) {
