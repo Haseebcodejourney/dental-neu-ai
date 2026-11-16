@@ -9,7 +9,7 @@ class Settings:
     yolo_confidence: float = float(os.getenv("YOLO_CONFIDENCE", "0.25"))
     device: str = os.getenv("DEVICE", "cpu")
     anthropic_api_key: str = os.getenv("ANTHROPIC_API_KEY", "")
-    rag_pdf_dir: str = os.getenv("RAG_PDF_DIR", "./data/pdfs")
+    rag_pdf_dir: str = os.getenv("RAG_PDF_DIR", "./data/rag")
 
 
 settings = Settings()

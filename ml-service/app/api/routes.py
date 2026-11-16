@@ -1,6 +1,7 @@
 from fastapi import APIRouter, File, UploadFile
 from pydantic import BaseModel, ConfigDict, Field
 
+from app.services.diagnoser import diagnose as run_diagnose
 from app.services.yolo_classifier import get_classifier
 
 router = APIRouter()
@@ -60,20 +61,6 @@ async def classify(image: UploadFile = File(...)) -> ClassifyResponse:
 
 @router.post("/diagnose", response_model=DiagnoseResponse)
 async def diagnose(body: DiagnoseRequest) -> DiagnoseResponse:
-    """Stub class-aligned RAG + Claude. Wire RAG_PDF_DIR + ANTHROPIC_API_KEY later."""
-    disease = body.class_
-    return DiagnoseResponse(
-        diagnosis=(
-            f"Stub diagnosis for class '{disease}'. "
-            "Replace with class-aligned RAG retrieval and Claude Sonnet."
-        ),
-        citations=[
-            Citation(
-                source=f"{disease}.pdf",
-                page_or_section="1",
-                passage=f"Placeholder passage for class '{disease}'.",
-                relevance_score=0.0,
-            )
-        ],
-        model="claude-stub",
-    )
+    """Class-aligned RAG lookup + stub diagnosis (Claude TODO when key + corpus ready)."""
+    result = run_diagnose(body.class_, body.image_id)
+    return DiagnoseResponse.model_validate(result)
