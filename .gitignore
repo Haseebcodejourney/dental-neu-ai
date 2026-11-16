@@ -17,4 +17,7 @@ __pycache__/
 *.onnx
 ml-service/models/
 ml-service/runs/
-ml-service/data/
+ml-service/data/**
+!ml-service/data/rag/
+!ml-service/data/rag/.gitkeep
+*.pdf

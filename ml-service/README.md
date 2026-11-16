@@ -10,9 +10,11 @@ NestJS orchestrates the pipeline and calls this service; models live here.
 | --- | --- | --- |
 | `GET` | `/health` | Liveness |
 | `POST` | `/classify` | Multipart `image` → `{ class, confidence, model, detections[] }` |
-| `POST` | `/diagnose` | JSON `{ class, image_id? }` → `{ diagnosis, citations[], model }` (stub) |
+| `POST` | `/diagnose` | JSON `{ class, image_id? }` → `{ diagnosis, citations[], model }` |
 
 `detections[]` entries are `{ class, confidence, bbox }` where `bbox` is absolute `[x1, y1, x2, y2]`. Empty when the stub runs or the model is classification-only.
+
+`/diagnose` looks up PDFs under `RAG_PDF_DIR/{class}/` and returns Nest-compatible `{ diagnosis, citations[], model }`. Without PDFs and without a wired LLM, `citations` is `[]` and `model` is `"stub"`.
 
 ## Run
 
@@ -42,6 +44,26 @@ When you have a trained Ultralytics weight:
    ```
 3. Restart uvicorn. The service loads the model once and uses it for `/classify`.
 
+## Class-aligned RAG PDFs (optional)
+
+Convention (relative to `RAG_PDF_DIR`, default `./data/rag`):
+
+```
+data/rag/
+  caries/
+    review.pdf
+  periodontitis/
+    guidelines.pdf
+```
+
+1. Create a folder named exactly as the predicted class (safe chars: letters, digits, `._-` and spaces).
+2. Drop one or more `.pdf` files into that folder. PDFs are gitignored — do not commit corpus files.
+3. Restart is not required for new files; each `/diagnose` re-lists the folder.
+
+Current behavior: list PDFs as citation shells (no page/passage extraction). Empty folder or missing class dir → `citations: []`.
+
+**Later:** LlamaIndex (or similar) for chunking/embeddings + Claude Sonnet via `ANTHROPIC_API_KEY`. Keep those deps out of `requirements.txt` until wired.
+
 ## NestJS integration
 
 Set `ML_SERVICE_URL=http://localhost:8000` in `backend/.env`.
@@ -52,8 +74,3 @@ The Nest `MlClientService` calls:
 - `POST {ML_SERVICE_URL}/diagnose` — JSON `{ "class": "<predicted>", "image_id": "<optional>" }`
 
 Nest consumes `class`, `confidence`, and `model`. Extra fields such as `detections` are ignored until the client is extended.
-
-## Later
-
-- Class-aligned PDF retrieval from `RAG_PDF_DIR`
-- Claude via `ANTHROPIC_API_KEY`
