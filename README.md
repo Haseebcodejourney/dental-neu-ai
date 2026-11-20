@@ -20,7 +20,7 @@ Own labeled data. Primary CV: **YOLO** (alts: EfficientNet-V2/ConvNeXt, Swin/ViT
 
 ```
 backend/      NestJS API (orchestrates uploads → classify → diagnose)
-ml-service/   FastAPI ML service (YOLO + RAG/Claude stubs)
+ml-service/   FastAPI ML service (YOLO + class-aligned RAG + Claude)
 frontend/     Next.js App Router diagnose UI
 ```
 
@@ -60,6 +60,10 @@ npm run dev                  # http://localhost:3041
 
 See [`backend/README.md`](backend/README.md), [`ml-service/README.md`](ml-service/README.md), and [`frontend/README.md`](frontend/README.md).
 
+## Class-aligned RAG PDFs
+
+Drop reference PDFs into `ml-service/rag/pdfs/<class_slug>/` (see [`ml-service/rag/pdfs/README.md`](ml-service/rag/pdfs/README.md)). Set `ANTHROPIC_API_KEY` in `ml-service/.env` for Claude Sonnet grounded text. Without PDFs/key the pipeline still returns a structured stub.
+
 ## Status
 
-Scaffold + YOLO classify path + Next diagnose UI. YOLO loads optional `.pt`; RAG lists optional class PDFs under `RAG_PDF_DIR/{class}/*.pdf`. No corpus or Claude/LlamaIndex inference in-repo.
+YOLO classify + Nest orchestration + Next diagnose UI. Class-aligned RAG retrieves PDF chunks by predicted class slug; Claude Sonnet grounds diagnosis text when `ANTHROPIC_API_KEY` is set.

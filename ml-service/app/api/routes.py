@@ -31,6 +31,7 @@ class DiagnoseRequest(BaseModel):
 
     class_: str = Field(alias="class")
     image_id: str | None = None
+    detections: list[Detection] = Field(default_factory=list)
 
 
 class Citation(BaseModel):
@@ -61,6 +62,14 @@ async def classify(image: UploadFile = File(...)) -> ClassifyResponse:
 
 @router.post("/diagnose", response_model=DiagnoseResponse)
 async def diagnose(body: DiagnoseRequest) -> DiagnoseResponse:
-    """Class-aligned RAG lookup + stub diagnosis (Claude TODO when key + corpus ready)."""
-    result = run_diagnose(body.class_, body.image_id)
+    """Class-aligned RAG retrieval + Claude Sonnet (stub fallback when key/corpus missing)."""
+    detections = [
+        {
+            "class": d.class_,
+            "confidence": d.confidence,
+            "bbox": d.bbox,
+        }
+        for d in body.detections
+    ]
+    result = run_diagnose(body.class_, body.image_id, detections=detections)
     return DiagnoseResponse.model_validate(result)

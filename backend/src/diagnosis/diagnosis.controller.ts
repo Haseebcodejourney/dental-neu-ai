@@ -17,11 +17,11 @@ export class DiagnosisController {
   listStub() {
     return {
       message:
-        'POST /api/diagnosis/run with multipart field "image" to run the stub CV → diagnose pipeline.',
+        'POST /api/diagnosis/run with multipart field "image" to run CV → RAG → diagnose.',
     };
   }
 
-  /** Stub orchestration: record job → ML classify → ML diagnose → persist entities. */
+  /** Orchestration: record job → ML classify → ML diagnose (RAG + Claude/stub) → persist. */
   @Post('run')
   @UseInterceptors(
     FileInterceptor('image', {

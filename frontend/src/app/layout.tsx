@@ -17,7 +17,7 @@ const body = Figtree({
 export const metadata: Metadata = {
   title: "Dental NEU AI — Diagnose",
   description:
-    "Upload a panoramic radiograph for YOLO classification and stub diagnosis.",
+    "Upload a panoramic radiograph for YOLO classification and RAG-grounded diagnosis.",
 };
 
 export default function RootLayout({
