@@ -73,8 +73,13 @@ class YoloClassifier:
             return dict(STUB_RESULT)
 
         try:
+            # Ultralytics predict() does not accept raw BytesIO; use RGB ndarray.
+            from PIL import Image
+            import numpy as np
+
+            image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
             results = self._model.predict(
-                source=io.BytesIO(image_bytes),
+                source=np.asarray(image),
                 conf=self.confidence,
                 device=self.device,
                 verbose=False,

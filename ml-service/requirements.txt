@@ -2,6 +2,7 @@ fastapi>=0.115.0
 uvicorn[standard]>=0.32.0
 pydantic>=2.9.0
 python-multipart>=0.0.12
+python-dotenv>=1.0.0
 
 # YOLO (Ultralytics pulls torch / torchvision — large downloads on first install)
 ultralytics>=8.3.0

@@ -1,4 +1,10 @@
 import os
+from pathlib import Path
+
+from dotenv import load_dotenv
+
+# Load ml-service/.env when present (does not override already-set process env).
+load_dotenv(Path(__file__).resolve().parents[2] / ".env")
 
 
 class Settings:
