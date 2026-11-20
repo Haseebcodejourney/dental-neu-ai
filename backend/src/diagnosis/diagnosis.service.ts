@@ -108,6 +108,7 @@ export class DiagnosisService {
           class: cv.predictedClass,
           confidence: cv.confidence,
           model: cv.modelName,
+          detections: classification.detections ?? [],
         },
         diagnosis: {
           text: llm.diagnosisText,

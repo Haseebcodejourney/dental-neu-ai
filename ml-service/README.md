@@ -73,4 +73,4 @@ The Nest `MlClientService` calls:
 - `POST {ML_SERVICE_URL}/classify` — `multipart/form-data` field `image`
 - `POST {ML_SERVICE_URL}/diagnose` — JSON `{ "class": "<predicted>", "image_id": "<optional>" }`
 
-Nest consumes `class`, `confidence`, and `model`. Extra fields such as `detections` are ignored until the client is extended.
+Nest consumes `class`, `confidence`, `model`, and forwards `detections` on `POST /api/diagnosis/run`.
