@@ -14,13 +14,14 @@ Own labeled data. Primary CV: **YOLO** (alts: EfficientNet-V2/ConvNeXt, Swin/ViT
 | ML | **FastAPI** (`ml-service/`) — CV + RAG/LLM |
 | Database | **AWS RDS PostgreSQL** (local Docker optional) |
 | ORM | TypeORM |
-| Front-end | Next.js (planned) |
+| Front-end | **Next.js** (`frontend/`) — diagnose UI |
 
 ## Repository
 
 ```
 backend/      NestJS API (orchestrates uploads → classify → diagnose)
 ml-service/   FastAPI ML service (YOLO + RAG/Claude stubs)
+frontend/     Next.js App Router diagnose UI
 ```
 
 ## Quick start
@@ -46,10 +47,19 @@ npm run start:dev
 ```
 
 - `GET /api/health`
-- `POST /api/diagnosis/run` — multipart `image` → stub pipeline via ml-service
+- `POST /api/diagnosis/run` — multipart `image` → classify → diagnose via ml-service
 
-See [`backend/README.md`](backend/README.md) and [`ml-service/README.md`](ml-service/README.md).
+### Frontend
+
+```bash
+cd frontend
+cp .env.example .env.local   # NEXT_PUBLIC_API_URL=http://localhost:3000
+npm install
+npm run dev                  # http://localhost:3041
+```
+
+See [`backend/README.md`](backend/README.md), [`ml-service/README.md`](ml-service/README.md), and [`frontend/README.md`](frontend/README.md).
 
 ## Status
 
-Scaffold + stub ML wiring. YOLO loads optional `.pt`; RAG lists optional class PDFs under `RAG_PDF_DIR/{class}/*.pdf`. No weights, corpus, or Claude/LlamaIndex inference in-repo.
+Scaffold + YOLO classify path + Next diagnose UI. YOLO loads optional `.pt`; RAG lists optional class PDFs under `RAG_PDF_DIR/{class}/*.pdf`. No corpus or Claude/LlamaIndex inference in-repo.

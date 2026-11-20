@@ -5,10 +5,18 @@ import { AxiosError } from 'axios';
 import FormData from 'form-data';
 import { firstValueFrom } from 'rxjs';
 
+export type Detection = {
+  class: string;
+  confidence: number;
+  /** Absolute xyxy pixel coords [x1, y1, x2, y2] */
+  bbox: number[];
+};
+
 export type ClassifyResult = {
   class: string;
   confidence: number;
   model: string;
+  detections?: Detection[];
 };
 
 export type DiagnoseCitation = {

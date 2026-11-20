@@ -1,0 +1,97 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --ink: #071014;
+  --ink-lift: #0d1a1f;
+  --mist: #c8d9d4;
+  --mist-dim: #8aa39a;
+  --film: #e7f2ee;
+  --accent: #3dd6c6;
+  --accent-deep: #1f8f86;
+  --warn: #e8b86d;
+  --danger: #e07a6a;
+  --grain: rgba(231, 242, 238, 0.04);
+  --background: var(--ink);
+  --foreground: var(--film);
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--ink);
+  font-family: var(--font-body), system-ui, sans-serif;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--accent) 40%, transparent);
+  color: var(--film);
+}
+
+.atmosphere {
+  background:
+    radial-gradient(120% 80% at 50% -10%, #16343a 0%, transparent 55%),
+    radial-gradient(90% 60% at 100% 20%, #12282e 0%, transparent 50%),
+    radial-gradient(70% 50% at 0% 80%, #1a2e28 0%, transparent 45%),
+    linear-gradient(165deg, #071014 0%, #0a161a 45%, #09131a 100%);
+}
+
+.atmosphere::before {
+  content: "";
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  opacity: 0.35;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+  mix-blend-mode: soft-light;
+  z-index: 0;
+}
+
+.atmosphere > * {
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 35%, transparent);
+  }
+  70% {
+    box-shadow: 0 0 0 14px transparent;
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.7s ease-out both;
+}
+
+.animate-fade-up-delay {
+  animation: fade-up 0.8s ease-out 0.12s both;
+}
+
+.animate-fade-up-delay-2 {
+  animation: fade-up 0.85s ease-out 0.24s both;
+}
+
+.drop-active {
+  animation: pulse-ring 1.4s ease-out infinite;
+}

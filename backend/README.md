@@ -59,7 +59,9 @@ npm install
 npm run start:dev
 ```
 
-API base: `http://localhost:3000/api`
+API base: `http://localhost:3000/api` (set `PORT` in `.env` if 3000 is already taken)
+
+Local Docker Postgres is published on host **5433** (`5433:5432`) so it does not collide with a Windows Postgres on 5432 — set `DATABASE_PORT=5433` in `.env`.
 
 - `GET /api/health` — process health
 - `GET /api/health?db=true` — health + Postgres ping
