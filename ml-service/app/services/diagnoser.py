@@ -1,8 +1,10 @@
-"""Class-aligned RAG + Claude Sonnet diagnosis for Nest POST /diagnose.
+"""Class-aligned RAG diagnosis for Nest POST /diagnose.
 
-Without ANTHROPIC_API_KEY (or on Claude failure): structured stub, model "stub".
-With key + successful call: grounded narrative, model "claude-sonnet-4-20250514".
-Missing PDFs never crash — empty citations + grounded/stub message.
+Default backend is **local**: grounded text from our trained YOLO detections
++ retrieved PDF passages (no cloud LLM). Optional DIAGNOSIS_BACKEND=anthropic
+keeps Claude as an opt-in only.
+
+Missing PDFs never crash — returns a structured local note with empty citations.
 """
 
 from __future__ import annotations
@@ -15,9 +17,10 @@ from app.services.rag_retriever import retrieve_citations
 
 logger = logging.getLogger(__name__)
 
+LOCAL_MODEL = "dental-yolo+rag"
 CLAUDE_MODEL = "claude-sonnet-4-20250514"
 _MAX_DETECTION_LINES = 24
-_MAX_PASSAGE_CHARS = 900
+_MAX_PASSAGE_CHARS = 500
 
 
 def diagnose(
@@ -27,6 +30,7 @@ def diagnose(
     detections: list[dict[str, Any]] | None = None,
     rag_pdf_dir: str | None = None,
     anthropic_api_key: str | None = None,
+    diagnosis_backend: str | None = None,
 ) -> dict[str, Any]:
     """Return { diagnosis, citations[], model } for POST /diagnose."""
     _ = image_id  # reserved for grounded multimodal calls later
@@ -41,6 +45,39 @@ def diagnose(
         extra_classes=extra_classes[1:] if len(extra_classes) > 1 else None,
     )
 
+    backend = (
+        diagnosis_backend
+        if diagnosis_backend is not None
+        else settings.diagnosis_backend
+    ).strip().lower() or "local"
+
+    if backend == "anthropic":
+        return _anthropic_or_local(
+            disease_class=disease_class,
+            detections=det_list,
+            citations=citations,
+            anthropic_api_key=anthropic_api_key,
+        )
+
+    # Default / unknown backends → local (own YOLO + RAG).
+    if backend not in {"local", "yolo", "rag", "dental-yolo+rag"}:
+        logger.warning("Unknown DIAGNOSIS_BACKEND %r; using local", backend)
+
+    text = _local_diagnosis(disease_class, det_list, citations)
+    return {
+        "diagnosis": text,
+        "citations": citations,
+        "model": LOCAL_MODEL,
+    }
+
+
+def _anthropic_or_local(
+    *,
+    disease_class: str,
+    detections: list[dict[str, Any]],
+    citations: list[dict[str, Any]],
+    anthropic_api_key: str | None,
+) -> dict[str, Any]:
     api_key = (
         anthropic_api_key
         if anthropic_api_key is not None
@@ -48,13 +85,18 @@ def diagnose(
     ).strip()
 
     if not api_key:
-        return _stub_diagnosis(disease_class, citations, det_list)
+        logger.info("DIAGNOSIS_BACKEND=anthropic but no API key; using local")
+        return {
+            "diagnosis": _local_diagnosis(disease_class, detections, citations),
+            "citations": citations,
+            "model": LOCAL_MODEL,
+        }
 
     try:
         text = _claude_diagnosis(
             api_key=api_key,
             disease_class=disease_class,
-            detections=det_list,
+            detections=detections,
             citations=citations,
         )
         return {
@@ -64,10 +106,14 @@ def diagnose(
         }
     except Exception:
         logger.exception(
-            "Claude diagnosis failed for class %r; falling back to stub",
+            "Claude diagnosis failed for class %r; falling back to local",
             disease_class,
         )
-        return _stub_diagnosis(disease_class, citations, det_list)
+        return {
+            "diagnosis": _local_diagnosis(disease_class, detections, citations),
+            "citations": citations,
+            "model": LOCAL_MODEL,
+        }
 
 
 def _unique_classes(
@@ -91,35 +137,64 @@ def _build_query(disease_class: str, detections: list[dict[str, Any]]) -> str:
     return " ".join(parts)
 
 
-def _stub_diagnosis(
+def _local_diagnosis(
     disease_class: str,
-    citations: list[dict[str, Any]],
     detections: list[dict[str, Any]],
-) -> dict[str, Any]:
-    n = len(citations)
-    det_n = len(detections)
-    if n == 0:
-        note = (
-            f"Structured stub for class '{disease_class}'"
-            + (f" ({det_n} detection(s))" if det_n else "")
-            + ". No class-aligned PDF passages found under RAG_PDF_DIR. "
-            "Drop clinical PDFs into RAG_PDF_DIR/<class_slug>/*.pdf "
-            "(see ml-service/rag/pdfs/README.md) and set ANTHROPIC_API_KEY "
-            "for grounded Claude diagnosis."
+    citations: list[dict[str, Any]],
+) -> str:
+    """Grounded narrative from our YOLO labels + class-aligned RAG (no cloud LLM)."""
+    primary = (disease_class or "unknown").strip() or "unknown"
+    parts: list[str] = [
+        f"Local diagnosis from trained dental YOLO + class-aligned RAG.",
+        f"Primary predicted class: {primary}.",
+    ]
+
+    if detections:
+        lines: list[str] = []
+        for det in detections[:_MAX_DETECTION_LINES]:
+            label = str(det.get("class") or "unknown")
+            conf = det.get("confidence")
+            conf_s = f"{float(conf) * 100:.1f}%" if conf is not None else "?"
+            lines.append(f"- {label} ({conf_s})")
+        if len(detections) > _MAX_DETECTION_LINES:
+            lines.append(f"- … {len(detections) - _MAX_DETECTION_LINES} more")
+        parts.append("Detections:\n" + "\n".join(lines))
+    else:
+        parts.append(
+            "No bounding-box detections were returned; "
+            "the primary class alone drives this note."
+        )
+
+    usable = [
+        c
+        for c in citations
+        if str(c.get("passage") or "").strip()
+        and not str(c.get("passage") or "").startswith("[PDF")
+    ]
+    if usable:
+        blocks: list[str] = []
+        for i, cite in enumerate(usable[:5], start=1):
+            passage = str(cite.get("passage") or "")[:_MAX_PASSAGE_CHARS].strip()
+            loc = cite.get("page_or_section") or "n/a"
+            src = cite.get("source") or "unknown"
+            blocks.append(f"[{i}] {src} ({loc}): {passage}")
+        parts.append(
+            "Retrieved reference passages for the predicted class(es):\n"
+            + "\n".join(blocks)
+        )
+        parts.append(
+            "Interpretation is limited to the detections and passages above. "
+            "This is decision support for clinician review, not a final diagnosis."
         )
     else:
-        note = (
-            f"Structured stub for class '{disease_class}' "
-            f"with {n} retrieved passage(s)"
-            + (f" and {det_n} detection(s)" if det_n else "")
-            + ". ANTHROPIC_API_KEY missing or Claude unavailable — "
-            "citations are returned without LLM narrative."
+        parts.append(
+            "No class-aligned PDF passages were found under RAG_PDF_DIR. "
+            f"Drop clinical PDFs into RAG_PDF_DIR/<class_slug>/ "
+            f"(e.g. for '{primary}') — see ml-service/rag/pdfs/README.md. "
+            "Until then, this note is based only on the YOLO prediction."
         )
-    return {
-        "diagnosis": note,
-        "citations": citations,
-        "model": "stub",
-    }
+
+    return "\n\n".join(parts)
 
 
 def _format_detections(detections: list[dict[str, Any]]) -> str:
@@ -145,7 +220,7 @@ def _format_citations(citations: list[dict[str, Any]]) -> str:
         return "(no retrieved passages — reason from detections and class only; state uncertainty)"
     blocks: list[str] = []
     for i, cite in enumerate(citations, start=1):
-        passage = str(cite.get("passage") or "")[:_MAX_PASSAGE_CHARS]
+        passage = str(cite.get("passage") or "")[:900]
         loc = cite.get("page_or_section") or "n/a"
         blocks.append(
             f"[{i}] source={cite.get('source')} section={loc}\n{passage}"
@@ -160,6 +235,7 @@ def _claude_diagnosis(
     detections: list[dict[str, Any]],
     citations: list[dict[str, Any]],
 ) -> str:
+    """Opt-in Anthropic path only when DIAGNOSIS_BACKEND=anthropic."""
     import anthropic
 
     system = (

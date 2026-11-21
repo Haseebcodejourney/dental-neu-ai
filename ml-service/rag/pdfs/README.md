@@ -45,7 +45,8 @@ rag/pdfs/carious-lesion/example-index.txt
 1. Choose the folder whose slug matches the YOLO class label.
 2. Copy one or more `.pdf` files into that folder (any filename).
 3. No restart required — each `/diagnose` re-reads the folder and chunks text.
-4. Set `ANTHROPIC_API_KEY` in `ml-service/.env` for Claude Sonnet grounded text.
+4. Restart is not required — each `/diagnose` re-reads PDFs. Default backend is
+   local (`DIAGNOSIS_BACKEND=local`): diagnosis uses YOLO + these passages.
 
-Without PDFs and/or without an API key the service still returns a structured
-stub diagnosis (`model: "stub"`) and never crashes.
+Without PDFs the service still returns a YOLO-based local note
+(`model: "dental-yolo+rag"`) and never crashes.

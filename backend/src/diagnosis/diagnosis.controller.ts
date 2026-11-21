@@ -21,7 +21,7 @@ export class DiagnosisController {
     };
   }
 
-  /** Orchestration: record job → ML classify → ML diagnose (RAG + Claude/stub) → persist. */
+  /** Orchestration: record job → ML classify → ML diagnose (local YOLO + RAG) → persist. */
   @Post('run')
   @UseInterceptors(
     FileInterceptor('image', {

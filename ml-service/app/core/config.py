@@ -14,6 +14,8 @@ class Settings:
     yolo_model_path: str = os.getenv("YOLO_MODEL_PATH", "")
     yolo_confidence: float = float(os.getenv("YOLO_CONFIDENCE", "0.25"))
     device: str = os.getenv("DEVICE", "cpu")
+    # local (default) = own dental-yolo + class-aligned RAG; anthropic = opt-in only
+    diagnosis_backend: str = os.getenv("DIAGNOSIS_BACKEND", "local")
     anthropic_api_key: str = os.getenv("ANTHROPIC_API_KEY", "")
     # Class-aligned PDFs live under RAG_PDF_DIR/<class_slug>/*.pdf
     # Default: ml-service/rag/pdfs (see rag/pdfs/README.md).

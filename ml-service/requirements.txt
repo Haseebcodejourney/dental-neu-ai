@@ -11,5 +11,5 @@ pillow>=10.0.0
 # Class-aligned RAG (light local retrieval; LlamaIndex-swappable later)
 pypdf>=5.0.0
 
-# Claude Sonnet for grounded diagnosis text
+# Optional: only needed when DIAGNOSIS_BACKEND=anthropic
 anthropic>=0.40.0

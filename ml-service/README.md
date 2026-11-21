@@ -1,6 +1,6 @@
 # Dental NEU AI — ML Service
 
-FastAPI service for CV classification and class-aligned RAG + Claude diagnosis.
+FastAPI service for CV classification and class-aligned RAG diagnosis grounded on our trained YOLO.
 
 NestJS orchestrates the pipeline and calls this service; models live here.
 
@@ -14,7 +14,7 @@ NestJS orchestrates the pipeline and calls this service; models live here.
 
 `detections[]` entries are `{ class, confidence, bbox }` where `bbox` is absolute `[x1, y1, x2, y2]`. Empty when the stub runs or the model is classification-only.
 
-`/diagnose` retrieves PDF chunks under `RAG_PDF_DIR/<class_slug>/`, optionally calls Claude Sonnet when `ANTHROPIC_API_KEY` is set, and returns Nest-compatible `{ diagnosis, citations[], model }`. Without PDFs and/or without a key, `citations` may be `[]` and `model` is `"stub"` — the endpoint does not crash.
+`/diagnose` retrieves PDF chunks under `RAG_PDF_DIR/<class_slug>/` and builds a grounded note from **our trained YOLO detections + RAG** (`model: "dental-yolo+rag"`). Default `DIAGNOSIS_BACKEND=local` — no cloud LLM. Without PDFs, `citations` may be `[]` but diagnosis still returns from YOLO — the endpoint does not crash.
 
 ## Run
 
@@ -64,9 +64,14 @@ Folders use **slugs** derived from the 14 YOLO legend labels (see [`rag/pdfs/REA
 
 Empty folder or missing class dir → `citations: []`.
 
-## Claude diagnosis
+## Diagnosis backend
 
-Set `ANTHROPIC_API_KEY` in `.env` (never commit the key). On success, `model` is the Claude Sonnet id and `diagnosis` is grounded on detections + retrieved passages. Missing key or API errors → structured stub (`model: "stub"`).
+| `DIAGNOSIS_BACKEND` | Behavior |
+| --- | --- |
+| `local` (default) | Own `dental-yolo` detections + class-aligned RAG → `model: "dental-yolo+rag"` |
+| `anthropic` | Opt-in Claude Sonnet (needs `ANTHROPIC_API_KEY`); falls back to local on error |
+
+Drop PDFs under `rag/pdfs/<class_slug>/` to enrich the local narrative with passages.
 
 ## NestJS integration
 

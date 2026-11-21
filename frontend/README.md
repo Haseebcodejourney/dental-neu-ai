@@ -1,6 +1,6 @@
 # Dental NEU AI — Frontend
 
-Next.js (App Router) diagnose UI: upload a panoramic → Nest `POST /api/diagnosis/run` → show top class, detections, and RAG/Claude diagnosis text (stub when ML falls back).
+Next.js (App Router) diagnose UI: upload a panoramic → Nest `POST /api/diagnosis/run` → show top class, detections, and local YOLO+RAG diagnosis text.
 
 ## Run
 

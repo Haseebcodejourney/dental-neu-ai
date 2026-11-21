@@ -4,7 +4,7 @@ AI dental **disease diagnosis** from images:
 
 **Image → CV classification → class-aligned RAG → LLM → Diagnosis UI**
 
-Own labeled data. Primary CV: **YOLO** (alts: EfficientNet-V2/ConvNeXt, Swin/ViT). RAG retrieves a PDF/passages for the predicted disease class. LLM (Claude Sonnet) produces a grounded diagnosis.
+Own labeled data. Primary CV: **YOLO** (`dental-yolo.pt`). RAG retrieves PDF passages for the predicted disease class. Diagnosis text defaults to **local** grounding (YOLO + RAG) — no cloud LLM required.
 
 ## Stack (MVP)
 
@@ -20,7 +20,7 @@ Own labeled data. Primary CV: **YOLO** (alts: EfficientNet-V2/ConvNeXt, Swin/ViT
 
 ```
 backend/      NestJS API (orchestrates uploads → classify → diagnose)
-ml-service/   FastAPI ML service (YOLO + class-aligned RAG + Claude)
+ml-service/   FastAPI ML service (trained YOLO + class-aligned RAG diagnosis)
 frontend/     Next.js App Router diagnose UI
 ```
 
@@ -62,8 +62,8 @@ See [`backend/README.md`](backend/README.md), [`ml-service/README.md`](ml-servic
 
 ## Class-aligned RAG PDFs
 
-Drop reference PDFs into `ml-service/rag/pdfs/<class_slug>/` (see [`ml-service/rag/pdfs/README.md`](ml-service/rag/pdfs/README.md)). Set `ANTHROPIC_API_KEY` in `ml-service/.env` for Claude Sonnet grounded text. Without PDFs/key the pipeline still returns a structured stub.
+Drop reference PDFs into `ml-service/rag/pdfs/<class_slug>/` (see [`ml-service/rag/pdfs/README.md`](ml-service/rag/pdfs/README.md)). Diagnosis uses `DIAGNOSIS_BACKEND=local` by default (trained YOLO + RAG).
 
 ## Status
 
-YOLO classify + Nest orchestration + Next diagnose UI. Class-aligned RAG retrieves PDF chunks by predicted class slug; Claude Sonnet grounds diagnosis text when `ANTHROPIC_API_KEY` is set.
+YOLO classify + Nest orchestration + Next diagnose UI. Class-aligned RAG retrieves PDF chunks by predicted class slug; local grounded diagnosis text from our trained model + RAG (`dental-yolo+rag`).

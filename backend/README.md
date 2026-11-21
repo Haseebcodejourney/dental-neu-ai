@@ -67,7 +67,7 @@ Local Docker Postgres is published on host **5433** (`5433:5432`) so it does not
 - `GET /api/health?db=true` — health + Postgres ping
 - `GET /api/uploads` — stub
 - `GET /api/diagnosis` — usage hint
-- `POST /api/diagnosis/run` — multipart `image` → record job → ML classify → ML diagnose (RAG + Claude/stub) → persist
+- `POST /api/diagnosis/run` — multipart `image` → record job → ML classify → ML diagnose (YOLO + RAG local) → persist
 
 ## Point at AWS Aurora PostgreSQL
 

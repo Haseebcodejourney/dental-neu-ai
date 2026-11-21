@@ -62,7 +62,7 @@ async def classify(image: UploadFile = File(...)) -> ClassifyResponse:
 
 @router.post("/diagnose", response_model=DiagnoseResponse)
 async def diagnose(body: DiagnoseRequest) -> DiagnoseResponse:
-    """Class-aligned RAG retrieval + Claude Sonnet (stub fallback when key/corpus missing)."""
+    """Class-aligned RAG + local YOLO-grounded diagnosis (Anthropic opt-in via env)."""
     detections = [
         {
             "class": d.class_,
