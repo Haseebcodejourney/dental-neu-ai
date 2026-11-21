@@ -66,4 +66,4 @@ Drop reference PDFs into `ml-service/rag/pdfs/<class_slug>/` (see [`ml-service/r
 
 ## Status
 
-YOLO classify + Nest orchestration + Next diagnose UI. Class-aligned RAG retrieves PDF chunks by predicted class slug; local grounded diagnosis text from our trained model + RAG (`dental-yolo+rag`).
+YOLO classify + Nest orchestration + Next diagnose UI. Class-aligned RAG retrieves PDF chunks by predicted class slug; local grounded diagnosis text from our trained model + RAG (`dental-yolo+rag`). Train layout: `ml-service/training/` + `ml-service/datasets/dental/` (14 locked panoramic classes; no weights/images in-repo).
