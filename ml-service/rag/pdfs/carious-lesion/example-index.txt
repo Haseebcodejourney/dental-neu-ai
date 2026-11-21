@@ -1,0 +1,10 @@
+﻿# Example index (not medical content)
+
+Place peer-reviewed or guideline PDFs for this class in this folder, e.g.:
+
+  carious-lesion/
+    who-oral-health-excerpt.pdf
+    endodontics-review.pdf
+
+Filenames are free-form. The retriever indexes `*.pdf` only.
+This file is a layout example — it is not used at inference time.

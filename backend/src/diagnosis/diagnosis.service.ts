@@ -61,7 +61,11 @@ export class DiagnosisService {
         file.mimetype || 'application/octet-stream',
       );
 
-      const diagnosis = await this.ml.diagnose(classification.class, upload.id);
+      const diagnosis = await this.ml.diagnose(
+        classification.class,
+        upload.id,
+        classification.detections ?? [],
+      );
 
       const cv = await this.cvResults.save(
         this.cvResults.create({

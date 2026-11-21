@@ -7,3 +7,9 @@ python-dotenv>=1.0.0
 # YOLO (Ultralytics pulls torch / torchvision — large downloads on first install)
 ultralytics>=8.3.0
 pillow>=10.0.0
+
+# Class-aligned RAG (light local retrieval; LlamaIndex-swappable later)
+pypdf>=5.0.0
+
+# Optional: only needed when DIAGNOSIS_BACKEND=anthropic
+anthropic>=0.40.0

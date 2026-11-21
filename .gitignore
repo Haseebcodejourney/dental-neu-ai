@@ -20,4 +20,9 @@ ml-service/runs/
 ml-service/data/**
 !ml-service/data/rag/
 !ml-service/data/rag/.gitkeep
+# Keep class-aligned RAG folder scaffold; never commit PDF corpus
+!ml-service/rag/
+!ml-service/rag/pdfs/
+!ml-service/rag/pdfs/**
+ml-service/rag/pdfs/**/*.pdf
 *.pdf

@@ -71,12 +71,14 @@ export class MlClientService {
   async diagnose(
     predictedClass: string,
     imageId?: string,
+    detections?: Detection[],
   ): Promise<DiagnoseResult> {
     try {
       const { data } = await firstValueFrom(
         this.http.post<DiagnoseResult>(`${this.baseUrl}/diagnose`, {
           class: predictedClass,
           image_id: imageId ?? null,
+          detections: detections ?? [],
         }),
       );
       return data;

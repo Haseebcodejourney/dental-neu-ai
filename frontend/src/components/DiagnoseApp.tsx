@@ -103,7 +103,7 @@ export function DiagnoseApp() {
         </h1>
         <p className="mt-3 max-w-lg text-[0.98rem] leading-relaxed text-[var(--mist-dim)]">
           Drop a panoramic radiograph. We classify via Nest → YOLO, then return
-          the top class, detections, and a stub diagnosis.
+          the top class, detections, and a local YOLO + RAG diagnosis.
         </p>
       </header>
 
