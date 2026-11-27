@@ -1,8 +1,10 @@
 import type { DiagnosisRunResponse } from "./types";
 
+// Undefined → local Nest default. Explicit empty string → same-origin (nginx /api).
 const API_BASE =
-  process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ||
-  "http://localhost:3000";
+  process.env.NEXT_PUBLIC_API_URL === undefined
+    ? "http://localhost:3000"
+    : process.env.NEXT_PUBLIC_API_URL.replace(/\/$/, "");
 
 export async function runDiagnosis(file: File): Promise<DiagnosisRunResponse> {
   const form = new FormData();

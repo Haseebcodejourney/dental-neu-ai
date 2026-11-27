@@ -6,13 +6,20 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix('api');
+
+  const config = app.get(ConfigService);
+  const defaultOrigins = [
+    'http://localhost:3041',
+    'http://127.0.0.1:3041',
+    'http://localhost:3001',
+    'http://127.0.0.1:3001',
+  ];
+  const corsFromEnv = (process.env.CORS_ORIGINS ?? '')
+    .split(',')
+    .map((o) => o.trim())
+    .filter(Boolean);
   app.enableCors({
-    origin: [
-      'http://localhost:3041',
-      'http://127.0.0.1:3041',
-      'http://localhost:3001',
-      'http://127.0.0.1:3001',
-    ],
+    origin: corsFromEnv.length > 0 ? corsFromEnv : defaultOrigins,
     methods: ['GET', 'POST', 'OPTIONS'],
   });
   app.useGlobalPipes(
@@ -23,7 +30,6 @@ async function bootstrap() {
     }),
   );
 
-  const config = app.get(ConfigService);
   const port = config.get<number>('port', 3000);
   await app.listen(port);
 
